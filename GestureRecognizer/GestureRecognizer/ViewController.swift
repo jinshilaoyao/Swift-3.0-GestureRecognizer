@@ -14,6 +14,8 @@ class ViewController: UIViewController {
     @IBOutlet weak var img2: UIImageView!
     private var customGes = CustomGestureRecognizer()
     
+    private var currentScale = 1.0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         layoutUI()
@@ -67,6 +69,9 @@ class ViewController: UIViewController {
         
         let scale = recognizer.scale
         recognizer.view?.transform = CGAffineTransform(scaleX: scale, y: scale)
+        if recognizer.state == .ended || recognizer.state == .cancelled {
+            recognizer.scale = 1.0
+        }
     }
     
     /**
@@ -76,7 +81,9 @@ class ViewController: UIViewController {
      */
     
     func handleRotation(recognizer: UIRotationGestureRecognizer) {
+        
         recognizer.view?.transform = CGAffineTransform(rotationAngle: recognizer.rotation)
+        
     }
     
     /**
@@ -150,19 +157,6 @@ class ViewController: UIViewController {
      *
      *  @param recognizer 自定义手势识别器对象实例
      */
-//    - (void)handleCustomGestureRecognizer:(KMGestureRecognizer *)recognizer {
-//    //代码块方式封装操作方法
-//    void (^positionOperation)() = ^() {
-//    CGPoint newPoint = recognizer.view.center;
-//    newPoint.x -= 20.0;
-//    _imgV.center = newPoint;
-//    
-//    newPoint.x += 40.0;
-//    _imgV2.center = newPoint;
-//    };
-//    
-//    positionOperation();
-//    }
     
     func handleCustomGestureRecognizer(recognizer: CustomGestureRecognizer) {
         
@@ -216,7 +210,6 @@ class ViewController: UIViewController {
      *  @param imgVCustom 绑定到图片视图对象实例
      */
 
-    
     func bindTap(imgVCustom: UIImageView) {
         let recognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         //    //使用一根手指双击时，才触发点按手势识别器
@@ -246,16 +239,20 @@ class ViewController: UIViewController {
         recognizer.direction = .right
         view.addGestureRecognizer(recognizer)
         //设置以自定义挠痒手势优先识别
-//        recognizer.require(toFail: )
+//        recognizer.require(toFail: customGes)
+        recognizer.require(toFail: customGes)
+        
         
         recognizer = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe))
         recognizer.direction = .left
         view.addGestureRecognizer(recognizer)
-//        recognizer.require(toFail: )
+//        recognizer.require(toFail: customGes)
+        recognizer.require(toFail: customGes)
     }
     
     func bindCustomGesture() {
         customGes = CustomGestureRecognizer(target: self, action: #selector(handleCustomGestureRecognizer))
+        
         view.addGestureRecognizer(customGes)
     }
     
